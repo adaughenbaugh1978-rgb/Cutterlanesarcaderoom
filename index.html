@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Clicker</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            width: 320px;
+        }
+        h1 {
+            color: #58a6ff;
+            margin-bottom: 5px;
+        }
+        .score-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #aff5b4;
+        }
+        .stats {
+            font-size: 0.9rem;
+            color: #8b949e;
+            margin-bottom: 20px;
+        }
+        #click-btn {
+            background: linear-gradient(135deg, #1f6feb 0%, #094cb4 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(31, 111, 235, 0.4);
+            transition: transform 0.1s, box-shadow 0.1s;
+            outline: none;
+        }
+        #click-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 5px rgba(31, 111, 235, 0.4);
+        }
+        .shop {
+            margin-top: 30px;
+            border-top: 1px solid #30363d;
+            padding-top: 20px;
+        }
+        .shop-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #21262d;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid #30363d;
+        }
+        .shop-item button {
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .shop-item button:disabled {
+            background-color: #21262d;
+            color: #484f58;
+            cursor: not-allowed;
+            border: 1px solid #30363d;
+        }
+        .item-info {
+            text-align: left;
+        }
+        .item-name {
+            font-weight: bold;
+            color: #f0f6fc;
+        }
+        .item-cost {
+            font-size: 0.8rem;
+            color: #8b949e;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Neon Clicker</h1>
+        <div class="score-display" id="score">0</div>
+        <div class="stats" id="cps-display">Clicks per second: 0</div>
+        
+        <button id="click-btn">CLICK ME!</button>
+
+        <div class="shop">
+            <h3>Upgrades</h3>
+            
+            <div class="shop-item">
+                <div class="item-info">
+                    <div class="item-name">Auto-Clicker</div>
+                    <div class="item-cost">Cost: <span id="auto-cost">15</span></div>
+                </div>
+                <button id="buy-auto" onclick="buyAuto()">Buy</button>
+            </div>
+
+            <div class="shop-item">
+                <div class="item-info">
+                    <div class="item-name">Click Multiplier</div>
+                    <div class="item-cost">Cost: <span id="mult-cost">50</span></div>
+                </div>
+                <button id="buy-mult" onclick="buyMult()">Buy</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let score = 0;
+        let clickValue = 1;
+        let autoClicksPerSecond = 0;
+        
+        let autoCost = 15;
+        let multCost = 50;
+
+        // DOM Elements
+        const scoreDisplay = document.getElementById('score');
+        const cpsDisplay = document.getElementById('cps-display');
+        const clickBtn = document.getElementById('click-btn');
+        const buyAutoBtn = document.getElementById('buy-auto');
+        const buyMultBtn = document.getElementById('buy-mult');
+        
+        const autoCostDisplay = document.getElementById('auto-cost');
+        const multCostDisplay = document.getElementById('mult-cost');
+
+        // Click Event
+        clickBtn.addEventListener('click', () => {
+            score += clickValue;
+            updateDisplay();
+        });
+
+        // Shop Functions
+        function buyAuto() {
+            if (score >= autoCost) {
+                score -= autoCost;
+                autoClicksPerSecond += 1;
+                autoCost = Math.round(autoCost * 1.15);
+                updateDisplay();
+            }
+        }
+
+        function buyMult() {
+            if (score >= multCost) {
+                score -= multCost;
+                clickValue += 1;
+                multCost = Math.round(multCost * 1.25);
+                updateDisplay();
+            }
+        }
+
+        // Game Loop (Runs every second for auto clickers)
+        setInterval(() => {
+            if (autoClicksPerSecond > 0) {
+                score += autoClicksPerSecond;
+                updateDisplay();
+            }
+        }, 1000);
+
+        // Update UI
+        function updateDisplay() {
+            scoreDisplay.textContent = Math.floor(score);
+            cpsDisplay.textContent = `Clicks per second: ${autoClicksPerSecond} | Per click: ${clickValue}`;
+            
+            autoCostDisplay.textContent = autoCost;
+            multCostDisplay.textContent = multCost;
+
+            // Enable/Disable buttons based on score
+            buyAutoBtn.disabled = score < autoCost;
+            buyMultBtn.disabled = score < multCost;
+        }
+
+        // Run once to set initial disabled states
+        updateDisplay();
+    </script>
+</body>
+</html>
